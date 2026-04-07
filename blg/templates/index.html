@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>blg - ブクログビューア</title>
+<style>
+{{ css }}
+</style>
+</head>
+<body>
+
+<header>
+  <h1><span>blg</span> ブクログビューア</h1>
+  <div class="controls">
+    <input type="search" id="search" placeholder="検索...">
+    <select id="status-filter">
+      <option value="">すべて</option>
+      <option value="1">読みたい</option>
+      <option value="2">いま読んでる</option>
+      <option value="3">読み終わった</option>
+      <option value="4">積読</option>
+    </select>
+    <select id="rating-filter">
+      <option value="">★ すべて</option>
+      <option value="5">★★★★★</option>
+      <option value="4">★★★★</option>
+      <option value="3">★★★</option>
+      <option value="2">★★</option>
+      <option value="1">★</option>
+    </select>
+    <select id="category-filter">
+      <option value="">カテゴリ: すべて</option>
+      {% for cat in categories %}
+      <option value="{{ cat }}">{{ cat }}</option>
+      {% endfor %}
+    </select>
+  </div>
+</header>
+
+<div class="tab-bar">
+  <button class="active" onclick="document.getElementById('books-view').classList.remove('hidden');document.getElementById('stats-view').classList.add('hidden');this.classList.add('active');this.nextElementSibling.classList.remove('active')">一覧</button>
+  <button onclick="document.getElementById('stats-view').classList.remove('hidden');document.getElementById('books-view').classList.add('hidden');this.classList.add('active');this.previousElementSibling.classList.remove('active')">統計</button>
+</div>
+
+<div class="container">
+  <div id="books-view">
+    <div id="book-count"></div>
+    <table>
+      <thead>
+        <tr>
+          <th width="50"></th>
+          <th data-sort="title">タイトル</th>
+          <th data-sort="author">著者</th>
+          <th data-sort="publisher" width="100">出版社</th>
+          <th data-sort="rating" width="70">評価</th>
+          <th data-sort="status_code" width="80">状態</th>
+          <th width="80">棚</th>
+          <th data-sort="pages" width="50">頁</th>
+          <th data-sort="created_at" width="90">登録日</th>
+        </tr>
+      </thead>
+      <tbody id="book-tbody"></tbody>
+    </table>
+  </div>
+
+  <div id="stats-view" class="hidden">
+    <div class="summary-cards">
+      <div class="summary-card"><div class="num">{{ stats.total }}</div><div class="label">総冊数</div></div>
+      <div class="summary-card"><div class="num">{{ "{:,}".format(stats.total_pages) }}</div><div class="label">総ページ</div></div>
+      <div class="summary-card"><div class="num">{{ stats.avg_pages }}</div><div class="label">平均ページ</div></div>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-card">
+        <h3>ステータス別</h3>
+        {% for name, cnt in stats.by_status %}
+        <div class="stat-row"><span>{{ name }}</span><span>{{ cnt }}</span></div>
+        {% endfor %}
+      </div>
+      <div class="stat-card">
+        <h3>評価別</h3>
+        {% for rating, cnt in stats.by_rating %}
+        <div class="stat-row"><span>{{ "★" * rating }}</span><span>{{ cnt }}</span><div class="stat-bar" style="width:{{ cnt * 2 }}px"></div></div>
+        {% endfor %}
+      </div>
+      <div class="stat-card">
+        <h3>著者 TOP 20</h3>
+        {% for author, cnt in stats.top_authors[:20] %}
+        <div class="stat-row"><span>{{ author }}</span><span>{{ cnt }}</span><div class="stat-bar" style="width:{{ (cnt / stats.top_authors[0][1] * 100)|int }}px"></div></div>
+        {% endfor %}
+      </div>
+      <div class="stat-card">
+        <h3>出版社 TOP 10</h3>
+        {% for pub, cnt in stats.top_publishers[:10] %}
+        <div class="stat-row"><span>{{ pub }}</span><span>{{ cnt }}</span><div class="stat-bar" style="width:{{ (cnt / stats.top_publishers[0][1] * 100)|int }}px"></div></div>
+        {% endfor %}
+      </div>
+      <div class="stat-card">
+        <h3>カテゴリ別</h3>
+        {% for cat, cnt in stats.by_category %}
+        <div class="stat-row"><span>{{ cat }}</span><span>{{ cnt }}</span></div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="generated">Generated: {{ generated_at }}</div>
+
+<script>
+window.ALL_BOOKS = {{ books_json }};
+</script>
+<script>
+{{ js }}
+</script>
+</body>
+</html>

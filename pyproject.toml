@@ -1,0 +1,18 @@
+[project]
+name = "blg"
+version = "0.1.0"
+description = "booklog.jp local viewer with CLI and web UI"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "click>=8.0",
+    "jinja2>=3.1",
+    "requests>=2.31",
+    "rich>=13.0",
+]
+
+[tool.setuptools.packages.find]
+include = ["blg*"]
+
+[project.scripts]
+blg = "blg.cli:cli"
