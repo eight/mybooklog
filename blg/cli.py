@@ -28,10 +28,25 @@ def cli(ctx, data_dir):
 
 @cli.command()
 @click.option("--user", "-u", default=DEFAULT_USER_ID, help="booklog.jp user ID")
+@click.option("--force", "-f", is_flag=True, help="キャッシュを無視して強制取得")
+@click.option("--cache-hours", type=float, default=24, help="キャッシュ有効時間 (時間, default: 24)")
 @click.pass_context
-def fetch(ctx, user):
+def fetch(ctx, user, force, cache_hours):
     """Fetch books from booklog.jp API (4ステータス並列)."""
     data_dir = ctx.obj["data_dir"]
+
+    if not force:
+        meta = db.get_meta(data_dir)
+        last_fetch = meta.get("last_fetch")
+        if last_fetch:
+            elapsed = datetime.now() - datetime.fromisoformat(last_fetch)
+            hours = elapsed.total_seconds() / 3600
+            if hours < cache_hours:
+                remaining = cache_hours - hours
+                all_books = db.load_books(data_dir)
+                console.print(f"[yellow]キャッシュ有効: {hours:.1f}時間前に取得済み (残り{remaining:.1f}時間, {len(all_books)}冊)[/yellow]")
+                console.print(f"[dim]強制取得するには --force を指定[/dim]")
+                return
 
     def on_progress(status_name, page, status_total):
         console.print(f"  [dim]{status_name}[/dim] p.{page} ({status_total}冊)", end="\r")

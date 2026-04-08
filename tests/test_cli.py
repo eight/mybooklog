@@ -3,6 +3,7 @@
 import csv
 import json
 import io
+from datetime import datetime, timedelta
 from pathlib import Path
 from unittest.mock import patch
 
@@ -179,3 +180,61 @@ class TestFetchCommand:
         assert "完了" in result.output
         loaded = db.load_books(d)
         assert len(loaded) == 2
+
+    @patch("blg.cli.api.fetch_all_books")
+    def test_fetch_cache_skips_when_recent(self, mock_fetch, runner, tmp_path):
+        d = tmp_path / "data"
+        d.mkdir()
+        db.save_books(SAMPLE_BOOKS, d)
+        db.set_meta("last_fetch", datetime.now().isoformat(), d)
+
+        result = runner.invoke(cli, ["--data-dir", str(d), "fetch"])
+        assert result.exit_code == 0
+        assert "キャッシュ有効" in result.output
+        mock_fetch.assert_not_called()
+
+    @patch("blg.cli.api.fetch_all_books")
+    def test_fetch_force_ignores_cache(self, mock_fetch, runner, tmp_path):
+        d = tmp_path / "data"
+        d.mkdir()
+        db.save_books(SAMPLE_BOOKS, d)
+        db.set_meta("last_fetch", datetime.now().isoformat(), d)
+
+        mock_fetch.return_value = SAMPLE_BOOKS
+        result = runner.invoke(cli, ["--data-dir", str(d), "fetch", "--force"])
+        assert result.exit_code == 0
+        assert "完了" in result.output
+        mock_fetch.assert_called_once()
+
+    @patch("blg.cli.api.fetch_all_books")
+    def test_fetch_cache_expired(self, mock_fetch, runner, tmp_path):
+        d = tmp_path / "data"
+        d.mkdir()
+        db.save_books(SAMPLE_BOOKS, d)
+        old_time = (datetime.now() - timedelta(hours=25)).isoformat()
+        db.set_meta("last_fetch", old_time, d)
+
+        mock_fetch.return_value = SAMPLE_BOOKS
+        result = runner.invoke(cli, ["--data-dir", str(d), "fetch"])
+        assert result.exit_code == 0
+        assert "完了" in result.output
+        mock_fetch.assert_called_once()
+
+    @patch("blg.cli.api.fetch_all_books")
+    def test_fetch_custom_cache_hours(self, mock_fetch, runner, tmp_path):
+        d = tmp_path / "data"
+        d.mkdir()
+        db.save_books(SAMPLE_BOOKS, d)
+        two_hours_ago = (datetime.now() - timedelta(hours=2)).isoformat()
+        db.set_meta("last_fetch", two_hours_ago, d)
+
+        # With default 24h cache, should skip
+        result = runner.invoke(cli, ["--data-dir", str(d), "fetch"])
+        assert "キャッシュ有効" in result.output
+        mock_fetch.assert_not_called()
+
+        # With 1h cache, should fetch
+        mock_fetch.return_value = SAMPLE_BOOKS
+        result = runner.invoke(cli, ["--data-dir", str(d), "fetch", "--cache-hours", "1"])
+        assert "完了" in result.output
+        mock_fetch.assert_called_once()
