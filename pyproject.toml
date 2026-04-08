@@ -14,5 +14,9 @@ dependencies = [
 [tool.setuptools.packages.find]
 include = ["mybooklog*"]
 
+[build-system]
+requires = ["setuptools>=68.0"]
+build-backend = "setuptools.build_meta"
+
 [project.scripts]
 mybooklog = "mybooklog.cli:cli"
