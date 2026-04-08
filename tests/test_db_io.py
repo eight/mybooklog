@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from blg import db
+from mybooklog import db
 
 
 @pytest.fixture

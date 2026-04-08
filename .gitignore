@@ -1,5 +1,5 @@
 output/
-.blg/
+.mybooklog/
 .venv/
 __pycache__/
 *.egg-info/

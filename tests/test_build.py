@@ -6,8 +6,8 @@ from pathlib import Path
 import pytest
 from click.testing import CliRunner
 
-from blg.cli import cli
-from blg import db
+from mybooklog.cli import cli
+from mybooklog import db
 
 
 SAMPLE_BOOKS = [

@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 from threading import Lock
 
-DEFAULT_DATA_DIR = Path(__file__).resolve().parent.parent / ".blg"
+DEFAULT_DATA_DIR = Path(__file__).resolve().parent.parent / ".mybooklog"
 
 _lock = Lock()
 

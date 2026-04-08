@@ -10,8 +10,8 @@ from unittest.mock import patch
 import pytest
 from click.testing import CliRunner
 
-from blg.cli import cli
-from blg import db
+from mybooklog.cli import cli
+from mybooklog import db
 
 
 SAMPLE_BOOKS = [
@@ -164,7 +164,7 @@ class TestExportCommand:
 # --- fetch command (mocked) ---
 
 class TestFetchCommand:
-    @patch("blg.cli.api.fetch_all_books")
+    @patch("mybooklog.cli.api.fetch_all_books")
     def test_fetch_saves_data(self, mock_fetch, runner, tmp_path):
         d = tmp_path / "data"
         d.mkdir()
@@ -181,7 +181,7 @@ class TestFetchCommand:
         loaded = db.load_books(d)
         assert len(loaded) == 2
 
-    @patch("blg.cli.api.fetch_all_books")
+    @patch("mybooklog.cli.api.fetch_all_books")
     def test_fetch_cache_skips_when_recent(self, mock_fetch, runner, tmp_path):
         d = tmp_path / "data"
         d.mkdir()
@@ -193,7 +193,7 @@ class TestFetchCommand:
         assert "キャッシュ有効" in result.output
         mock_fetch.assert_not_called()
 
-    @patch("blg.cli.api.fetch_all_books")
+    @patch("mybooklog.cli.api.fetch_all_books")
     def test_fetch_force_ignores_cache(self, mock_fetch, runner, tmp_path):
         d = tmp_path / "data"
         d.mkdir()
@@ -206,7 +206,7 @@ class TestFetchCommand:
         assert "完了" in result.output
         mock_fetch.assert_called_once()
 
-    @patch("blg.cli.api.fetch_all_books")
+    @patch("mybooklog.cli.api.fetch_all_books")
     def test_fetch_cache_expired(self, mock_fetch, runner, tmp_path):
         d = tmp_path / "data"
         d.mkdir()
@@ -220,7 +220,7 @@ class TestFetchCommand:
         assert "完了" in result.output
         mock_fetch.assert_called_once()
 
-    @patch("blg.cli.api.fetch_all_books")
+    @patch("mybooklog.cli.api.fetch_all_books")
     def test_fetch_custom_cache_hours(self, mock_fetch, runner, tmp_path):
         d = tmp_path / "data"
         d.mkdir()

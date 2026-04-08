@@ -1,5 +1,5 @@
 [project]
-name = "blg"
+name = "mybooklog"
 version = "0.1.0"
 description = "booklog.jp local viewer with CLI and web UI"
 readme = "README.md"
@@ -12,7 +12,7 @@ dependencies = [
 ]
 
 [tool.setuptools.packages.find]
-include = ["blg*"]
+include = ["mybooklog*"]
 
 [project.scripts]
-blg = "blg.cli:cli"
+mybooklog = "mybooklog.cli:cli"

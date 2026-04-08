@@ -2,7 +2,7 @@
 
 import pytest
 
-from blg.db import query_books, get_stats, get_all_authors, get_all_categories
+from mybooklog.db import query_books, get_stats, get_all_authors, get_all_categories
 
 
 BOOKS = [

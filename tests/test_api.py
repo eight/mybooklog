@@ -4,7 +4,7 @@ from unittest.mock import patch, MagicMock
 
 import pytest
 
-from blg.api import _normalize_book, _fetch_status, fetch_all_books, _get_with_retry
+from mybooklog.api import _normalize_book, _fetch_status, fetch_all_books, _get_with_retry
 
 
 # --- Normalize tests ---
@@ -86,7 +86,7 @@ class TestNormalizeBook:
 # --- Retry tests ---
 
 class TestGetWithRetry:
-    @patch("blg.api.requests.get")
+    @patch("mybooklog.api.requests.get")
     def test_success_first_try(self, mock_get):
         mock_resp = MagicMock()
         mock_resp.status_code = 200
@@ -95,8 +95,8 @@ class TestGetWithRetry:
         assert result == mock_resp
         assert mock_get.call_count == 1
 
-    @patch("blg.api.time.sleep")
-    @patch("blg.api.requests.get")
+    @patch("mybooklog.api.time.sleep")
+    @patch("mybooklog.api.requests.get")
     def test_retry_on_503(self, mock_get, mock_sleep):
         mock_503 = MagicMock()
         mock_503.status_code = 503
@@ -107,8 +107,8 @@ class TestGetWithRetry:
         assert mock_get.call_count == 2
         mock_sleep.assert_called_once()
 
-    @patch("blg.api.time.sleep")
-    @patch("blg.api.requests.get")
+    @patch("mybooklog.api.time.sleep")
+    @patch("mybooklog.api.requests.get")
     def test_retry_on_connection_error(self, mock_get, mock_sleep):
         import requests
         mock_200 = MagicMock()
@@ -117,8 +117,8 @@ class TestGetWithRetry:
         result = _get_with_retry("http://test", {}, retries=3)
         assert result == mock_200
 
-    @patch("blg.api.time.sleep")
-    @patch("blg.api.requests.get")
+    @patch("mybooklog.api.time.sleep")
+    @patch("mybooklog.api.requests.get")
     def test_max_retries_exhausted(self, mock_get, mock_sleep):
         import requests
         mock_get.side_effect = requests.ConnectionError()
@@ -130,8 +130,8 @@ class TestGetWithRetry:
 # --- Fetch status tests ---
 
 class TestFetchStatus:
-    @patch("blg.api.time.sleep")
-    @patch("blg.api._get_with_retry")
+    @patch("mybooklog.api.time.sleep")
+    @patch("mybooklog.api._get_with_retry")
     def test_single_page(self, mock_get, mock_sleep):
         mock_get.side_effect = [
             # First _fetch_pages call (all books)
@@ -144,8 +144,8 @@ class TestFetchStatus:
         assert len(books) == 1
         assert books[0]["title"] == "下谷叢話 (岩波文庫)"
 
-    @patch("blg.api.time.sleep")
-    @patch("blg.api._get_with_retry")
+    @patch("mybooklog.api.time.sleep")
+    @patch("mybooklog.api._get_with_retry")
     def test_multiple_pages(self, mock_get, mock_sleep):
         mock_get.side_effect = [
             MagicMock(json=lambda: {"books": [SAMPLE_API_BOOK]}),
@@ -157,15 +157,15 @@ class TestFetchStatus:
         books = _fetch_status("testuser", 3, "読み終わった")
         assert len(books) == 2
 
-    @patch("blg.api.time.sleep")
-    @patch("blg.api._get_with_retry")
+    @patch("mybooklog.api.time.sleep")
+    @patch("mybooklog.api._get_with_retry")
     def test_empty_result(self, mock_get, mock_sleep):
         mock_get.return_value = MagicMock(json=lambda: {"books": []})
         books = _fetch_status("testuser", 1, "読みたい")
         assert books == []
 
-    @patch("blg.api.time.sleep")
-    @patch("blg.api._get_with_retry")
+    @patch("mybooklog.api.time.sleep")
+    @patch("mybooklog.api._get_with_retry")
     def test_on_page_callback(self, mock_get, mock_sleep):
         mock_get.side_effect = [
             MagicMock(json=lambda: {"books": [SAMPLE_API_BOOK]}),
@@ -178,8 +178,8 @@ class TestFetchStatus:
         assert len(calls) == 1
         assert calls[0] == ("読み終わった", 1, 1)
 
-    @patch("blg.api.time.sleep")
-    @patch("blg.api._get_with_retry")
+    @patch("mybooklog.api.time.sleep")
+    @patch("mybooklog.api._get_with_retry")
     def test_review_merged(self, mock_get, mock_sleep):
         reviewed_book = {**SAMPLE_API_BOOK, "review": {"description": "素晴らしい本", "public": "1", "create_on": "2024-01-01"}}
         mock_get.side_effect = [
@@ -193,8 +193,8 @@ class TestFetchStatus:
         assert len(books) == 1
         assert books[0]["review"] == "素晴らしい本"
 
-    @patch("blg.api.time.sleep")
-    @patch("blg.api._get_with_retry")
+    @patch("mybooklog.api.time.sleep")
+    @patch("mybooklog.api._get_with_retry")
     def test_no_review(self, mock_get, mock_sleep):
         mock_get.side_effect = [
             MagicMock(json=lambda: {"books": [SAMPLE_API_BOOK]}),
@@ -208,21 +208,21 @@ class TestFetchStatus:
 # --- Fetch all books tests ---
 
 class TestFetchAllBooks:
-    @patch("blg.api._fetch_status")
+    @patch("mybooklog.api._fetch_status")
     def test_aggregates_all_statuses(self, mock_fetch):
         mock_fetch.return_value = [{"book_id": "1", "title": "Test"}]
         books = fetch_all_books("testuser", workers=1)
         assert len(books) == 4  # 4 statuses × 1 book each
         assert mock_fetch.call_count == 4
 
-    @patch("blg.api._fetch_status")
+    @patch("mybooklog.api._fetch_status")
     def test_on_batch_callback(self, mock_fetch):
         mock_fetch.return_value = [{"book_id": "1", "title": "Test"}]
         batches = []
         fetch_all_books("testuser", on_batch=lambda b, s: batches.append(s), workers=1)
         assert len(batches) == 4
 
-    @patch("blg.api._fetch_status")
+    @patch("mybooklog.api._fetch_status")
     def test_empty_statuses(self, mock_fetch):
         mock_fetch.return_value = []
         books = fetch_all_books("testuser", workers=1)

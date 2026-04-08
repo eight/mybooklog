@@ -78,7 +78,7 @@ def list_books(ctx, sort, status, author, search, rating, category, limit):
     """List books with sorting and filtering."""
     all_books = db.load_books(ctx.obj["data_dir"])
     if not all_books:
-        console.print("[yellow]No books found. Run 'blg fetch' first.[/yellow]")
+        console.print("[yellow]No books found. Run 'mybooklog fetch' first.[/yellow]")
         return
 
     books = db.query_books(all_books, sort=sort, status=status, author=author, search=search, rating=rating, category=category, limit=limit)
@@ -117,7 +117,7 @@ def stats(ctx):
     """Show collection statistics."""
     all_books = db.load_books(ctx.obj["data_dir"])
     if not all_books:
-        console.print("[yellow]No books found. Run 'blg fetch' first.[/yellow]")
+        console.print("[yellow]No books found. Run 'mybooklog fetch' first.[/yellow]")
         return
 
     s = db.get_stats(all_books)
@@ -168,7 +168,7 @@ def export(ctx, fmt, output, sort):
     """Export books to CSV or JSON."""
     all_books = db.load_books(ctx.obj["data_dir"])
     if not all_books:
-        console.print("[yellow]No books found. Run 'blg fetch' first.[/yellow]")
+        console.print("[yellow]No books found. Run 'mybooklog fetch' first.[/yellow]")
         return
 
     books = db.query_books(all_books, sort=sort)
@@ -197,7 +197,7 @@ def build(ctx, output, open):
 
     all_books = db.load_books(ctx.obj["data_dir"])
     if not all_books:
-        console.print("[yellow]No books found. Run 'blg fetch' first.[/yellow]")
+        console.print("[yellow]No books found. Run 'mybooklog fetch' first.[/yellow]")
         return
 
     pkg_dir = Path(__file__).parent
