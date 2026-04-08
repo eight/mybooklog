@@ -207,6 +207,11 @@ def build(ctx, output, open):
     css = (pkg_dir / "static" / "style.css").read_text(encoding="utf-8")
     js = (pkg_dir / "static" / "app.js").read_text(encoding="utf-8")
 
+    meta = db.get_meta(ctx.obj["data_dir"])
+    fetched_at = meta.get("last_fetch", "")
+    if fetched_at:
+        fetched_at = datetime.fromisoformat(fetched_at).strftime("%Y-%m-%d %H:%M")
+
     html = template.render(
         css=css,
         js=js,
@@ -214,6 +219,7 @@ def build(ctx, output, open):
         stats=db.get_stats(all_books),
         categories=db.get_all_categories(all_books),
         generated_at=datetime.now().strftime("%Y-%m-%d %H:%M"),
+        fetched_at=fetched_at,
     )
 
     default_output = Path(__file__).resolve().parent.parent / "output" / "index.html"

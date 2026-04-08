@@ -44,6 +44,7 @@ header {
   letter-spacing: -0.02em;
 }
 .logo span { color: var(--accent); }
+.logo .meta-info { font-size: 0.7rem; font-weight: 400; color: var(--dim); margin-left: 0.5rem; }
 
 .controls {
   display: flex; gap: 0.4rem; flex-wrap: wrap; align-items: center; flex: 1;
@@ -230,8 +231,6 @@ a:hover { text-decoration: underline; }
   transition: width 0.3s ease;
 }
 
-/* ---- Footer ---- */
-#generated { color: var(--dim); font-size: 0.7rem; text-align: center; padding: 1.5rem; }
 
 /* ---- Responsive ---- */
 @media (max-width: 768px) {

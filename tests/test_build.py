@@ -87,7 +87,7 @@ class TestHtmlStructure:
 
     def test_contains_generated_timestamp(self, runner, populated_dir, tmp_path):
         html = build_html(runner, populated_dir, tmp_path / "out.html")
-        assert "Generated:" in html
+        assert "生成:" in html
 
 
 # --- Category filter tests ---

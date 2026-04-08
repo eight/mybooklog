@@ -11,7 +11,7 @@
 <body>
 
 <header>
-  <div class="logo"><span>blg</span> ブクログビューア</div>
+  <div class="logo"><span>blg</span> ブクログビューア <span class="meta-info">取得: {{ fetched_at or "不明" }} / 生成: {{ generated_at }}</span></div>
   <div class="controls">
     <input type="search" id="search" placeholder="タイトル・著者・出版社で検索...">
     <select id="status-filter">
@@ -132,7 +132,6 @@
   </div>
 </div>
 
-<div id="generated">Generated: {{ generated_at }}</div>
 
 <script>
 window.ALL_BOOKS = {{ books_json }};
