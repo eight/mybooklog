@@ -14,13 +14,6 @@
   <div class="logo"><span>blg</span> ブクログビューア <span class="meta-info">取得: {{ fetched_at or "不明" }} / 生成: {{ generated_at }}</span></div>
   <div class="controls">
     <input type="search" id="search" placeholder="タイトル・著者・出版社で検索...">
-    <select id="status-filter">
-      <option value="">ステータス</option>
-      <option value="1">読みたい</option>
-      <option value="2">いま読んでる</option>
-      <option value="3">読み終わった</option>
-      <option value="4">積読</option>
-    </select>
     <select id="rating-filter">
       <option value="">評価</option>
       <option value="5">★★★★★</option>
@@ -49,8 +42,12 @@
 </header>
 
 <div class="tab-bar">
-  <button class="active" onclick="document.getElementById('books-view').classList.remove('hidden');document.getElementById('stats-view').classList.add('hidden');this.classList.add('active');this.nextElementSibling.classList.remove('active')">一覧 ({{ stats.total }})</button>
-  <button onclick="document.getElementById('stats-view').classList.remove('hidden');document.getElementById('books-view').classList.add('hidden');this.classList.add('active');this.previousElementSibling.classList.remove('active')">統計</button>
+  <button class="tab" data-tab="1">読みたい</button>
+  <button class="tab" data-tab="2">読んでる</button>
+  <button class="tab" data-tab="3">読み終わった</button>
+  <button class="tab" data-tab="4">積読</button>
+  <button class="tab active" data-tab="all">すべて ({{ stats.total }})</button>
+  <button class="tab" data-tab="stats">統計</button>
 </div>
 
 <div class="container">
@@ -58,7 +55,7 @@
     <div class="toolbar">
       <div id="book-count"></div>
     </div>
-    <div class="table-view">
+    <div class="table-view table-scroll">
       <table>
         <thead>
           <tr>
@@ -70,12 +67,17 @@
             <th>棚</th>
             <th data-sort="pages">頁</th>
             <th data-sort="created_at">登録日</th>
+            <th data-sort="read_at">読了日</th>
           </tr>
         </thead>
         <tbody id="book-tbody"></tbody>
       </table>
     </div>
-    <div id="card-container" class="card-view hidden"></div>
+    <div id="card-scroll" class="card-scroll hidden">
+      <div id="card-spacer">
+        <div id="card-container" class="card-grid"></div>
+      </div>
+    </div>
   </div>
 
   <div id="stats-view" class="hidden">

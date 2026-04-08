@@ -104,10 +104,12 @@ class TestCategoryFilter:
         html = build_html(runner, populated_dir, tmp_path / "out.html")
         assert 'カテゴリ' in html
 
-    def test_status_filter_options(self, runner, populated_dir, tmp_path):
+    def test_status_filter_tabs(self, runner, populated_dir, tmp_path):
         html = build_html(runner, populated_dir, tmp_path / "out.html")
-        assert '<option value="1">読みたい</option>' in html
-        assert '<option value="3">読み終わった</option>' in html
+        assert 'data-tab="1"' in html
+        assert 'data-tab="3"' in html
+        assert "読みたい" in html
+        assert "読み終わった" in html
 
     def test_rating_filter_options(self, runner, populated_dir, tmp_path):
         html = build_html(runner, populated_dir, tmp_path / "out.html")
@@ -120,14 +122,24 @@ class TestCategoryFilter:
 class TestTabsAndStats:
     def test_tab_buttons_exist(self, runner, populated_dir, tmp_path):
         html = build_html(runner, populated_dir, tmp_path / "out.html")
-        assert '一覧' in html
+        assert 'data-tab="all"' in html
+        assert 'data-tab="stats"' in html
         assert '統計</button>' in html
 
-    def test_tab_onclick_handlers(self, runner, populated_dir, tmp_path):
+    def test_tab_all_six_tabs(self, runner, populated_dir, tmp_path):
+        html = build_html(runner, populated_dir, tmp_path / "out.html")
+        for tab in ["1", "2", "3", "4", "all", "stats"]:
+            assert f'data-tab="{tab}"' in html
+
+    def test_tab_all_is_default_active(self, runner, populated_dir, tmp_path):
+        html = build_html(runner, populated_dir, tmp_path / "out.html")
+        assert 'class="tab active" data-tab="all"' in html
+
+    def test_tab_data_attributes(self, runner, populated_dir, tmp_path):
         html = build_html(runner, populated_dir, tmp_path / "out.html")
         assert "books-view" in html
         assert "stats-view" in html
-        assert "onclick=" in html
+        assert 'class="tab-bar"' in html
 
     def test_stats_view_has_hidden_class(self, runner, populated_dir, tmp_path):
         html = build_html(runner, populated_dir, tmp_path / "out.html")
@@ -195,6 +207,53 @@ class TestBooksJson:
         html = build_html(runner, populated_dir, tmp_path / "out.html")
         assert '百年の孤独' in html
         assert 'マルケス' in html
+
+
+# --- Virtual scroll structure tests ---
+
+class TestVirtualScroll:
+    def test_table_scroll_container(self, runner, populated_dir, tmp_path):
+        html = build_html(runner, populated_dir, tmp_path / "out.html")
+        assert 'class="table-view table-scroll"' in html
+
+    def test_card_scroll_container(self, runner, populated_dir, tmp_path):
+        html = build_html(runner, populated_dir, tmp_path / "out.html")
+        assert 'id="card-scroll"' in html
+        assert 'id="card-spacer"' in html
+        assert 'id="card-container"' in html
+
+    def test_js_virtual_scroll_functions(self, runner, populated_dir, tmp_path):
+        html = build_html(runner, populated_dir, tmp_path / "out.html")
+        assert "renderTableSlice" in html
+        assert "renderCardSlice" in html
+        assert "requestAnimationFrame" in html
+
+    def test_js_calibrate(self, runner, populated_dir, tmp_path):
+        html = build_html(runner, populated_dir, tmp_path / "out.html")
+        assert "calibrate" in html
+
+
+# --- Read-at column tests ---
+
+class TestReadAtColumn:
+    def test_read_at_header_exists(self, runner, populated_dir, tmp_path):
+        html = build_html(runner, populated_dir, tmp_path / "out.html")
+        assert 'data-sort="read_at"' in html
+        assert "読了日" in html
+
+    def test_read_at_sortable(self, runner, populated_dir, tmp_path):
+        html = build_html(runner, populated_dir, tmp_path / "out.html")
+        assert "read_at" in html
+        # read_at should be in DESC_SORTS
+        assert "read_at: 1" in html
+
+    def test_read_at_in_books_json(self, runner, populated_dir, tmp_path):
+        html = build_html(runner, populated_dir, tmp_path / "out.html")
+        start = html.index("window.ALL_BOOKS = ") + len("window.ALL_BOOKS = ")
+        end = html.index(";", start)
+        books = json.loads(html[start:end])
+        for book in books:
+            assert "read_at" in book
 
 
 # --- CLI build edge cases ---

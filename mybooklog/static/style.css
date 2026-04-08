@@ -82,14 +82,21 @@ header {
   display: flex; gap: 0; padding: 0 1.5rem; background: var(--surface);
   border-bottom: 1px solid var(--border);
 }
-.tab-bar button {
+.tab-bar .tab {
   background: transparent; color: var(--dim); border: none;
   border-bottom: 2px solid transparent;
   padding: 0.55rem 1.2rem; cursor: pointer; font-size: 0.85rem;
   transition: color 0.15s, border-color 0.15s;
 }
-.tab-bar button:hover { color: var(--text); }
-.tab-bar button.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
+.tab-bar .tab:hover { color: var(--text); }
+.tab-bar .tab.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
+.tab-bar .tab[data-tab="1"].active { color: var(--status-want); border-bottom-color: var(--status-want); }
+.tab-bar .tab[data-tab="2"].active { color: var(--status-reading); border-bottom-color: var(--status-reading); }
+.tab-bar .tab[data-tab="3"].active { color: var(--status-done); border-bottom-color: var(--status-done); }
+.tab-bar .tab[data-tab="4"].active { color: var(--status-stack); border-bottom-color: var(--status-stack); }
+
+/* Disabled controls (stats tab) */
+.controls.disabled { opacity: 0.4; pointer-events: none; }
 
 /* ---- Container ---- */
 .container { padding: 1rem 1.5rem 2rem; max-width: 1400px; margin: 0 auto; }
@@ -101,12 +108,28 @@ header {
 }
 #book-count { color: var(--dim); font-size: 0.8rem; }
 
+/* ---- Scroll containers ---- */
+.table-scroll {
+  max-height: calc(100vh - 140px);
+  overflow-y: auto;
+}
+.table-scroll.hidden { display: none; }
+.card-scroll {
+  max-height: calc(100vh - 140px);
+  overflow-y: auto;
+  position: relative;
+}
+.card-scroll.hidden { display: none; }
+#card-spacer { position: relative; }
+#card-container { position: absolute; top: 0; left: 0; right: 0; }
+.vspacer td { padding: 0 !important; border: none !important; }
+
 /* ---- Table view ---- */
 .table-view table { width: 100%; border-collapse: collapse; }
 .table-view th {
   background: var(--surface); padding: 0.55rem 0.6rem; text-align: left;
   cursor: pointer; user-select: none; font-size: 0.75rem; white-space: nowrap;
-  position: sticky; top: 52px; z-index: 10;
+  position: sticky; top: 0; z-index: 10;
   border-bottom: 2px solid var(--border);
   color: var(--text-secondary); font-weight: 600; text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -158,12 +181,11 @@ a:hover { text-decoration: underline; }
 .cat-cell { font-size: 0.75rem; color: var(--dim); }
 
 /* ---- Card view ---- */
-.card-view {
+.card-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
   gap: 1rem;
 }
-.card-view.hidden { display: none; }
 .book-card {
   background: var(--surface); border-radius: var(--radius); overflow: hidden;
   border: 1px solid var(--border); transition: box-shadow 0.2s, transform 0.15s;
@@ -238,5 +260,5 @@ a:hover { text-decoration: underline; }
   .container { padding: 0.8rem 1rem; }
   .controls input[type="search"] { min-width: 120px; }
   .table-view th, .table-view td { padding: 0.4rem; font-size: 0.78rem; }
-  .card-view { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 0.6rem; }
+  .card-grid { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 0.6rem; }
 }
